@@ -1,11 +1,11 @@
 <?php
 
-use Illuminate\Http\Request;
-use \App\Http\Controllers\ProductController;
-use \App\Http\Controllers\ManagerController;
+use Illuminate\Support\Facades\Route;
 use \App\Http\Controllers\StoreController;
 use \App\Http\Controllers\Api\AuthController;
-use Illuminate\Support\Facades\Route;
+use \App\Http\Controllers\ProductController;
+use \App\Http\Controllers\ManagerController;
+use \App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,9 +23,12 @@ Route::post('/auth/register', [AuthController::class, 'register']);
 
 Route::middleware('auth:sanctum')->group( function () {
     Route::resource('products', ProductController::class);
+    Route::get('/users/{user}/notifications', [UserController::class, 'getNotifications']);
+    Route::put('/users/{user}/notifications/{id}', [UserController::class, 'markSeenNotification']);
 
     Route::post('product/{product}/sell', [StoreController::class, 'makeSell']);
 
-    // TODO: protect endpoints, only managers can update products
+    // TODO: protect endpoints with roles, only managers can update products
+    // -> https://laravel.com/docs/9.x/authorization
     Route::post('product/{product}/manage/{status}', [ManagerController::class, 'manageProduct']);
 });

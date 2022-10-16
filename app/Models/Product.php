@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Notifications\ProductApproved;
+use App\Notifications\ProductRejected;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -110,6 +112,9 @@ class Product extends Model
             ['status' => UserProduct::$APPROVED]
         );
 
+        $owner = $this->owner;
+        $owner->notify(new ProductApproved($this));
+
         return $this;
     }
 
@@ -119,6 +124,9 @@ class Product extends Model
         ->update(
             ['status' => UserProduct::$REJECTED]
         );
+
+        $owner = $this->owner;
+        $owner->notify(new ProductRejected($this));
 
         return $this;
     }
