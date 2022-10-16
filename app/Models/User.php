@@ -2,12 +2,10 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use mysql_xdevapi\Collection;
 
 class User extends Authenticatable
 {
@@ -46,10 +44,12 @@ class User extends Authenticatable
     /**
      * The products list that the user own
      */
-public function products(){
-        
-
+    public function products(){
+        //return $this->hasManyThrough(Product::class, UserProduct::class, 'user_id', 'product_id', 'id', 'id');
         return $this->belongsToMany(Product::class, UserProduct::class, 'user_id', 'product_id', 'id', 'id');
-        //return $this->hasManyThrough(Product::class, UserProduct::class, 'user_id', 'id', 'id', 'product_id');
+    }
+
+    public function transactions(){
+        return $this->hasMany(Transaction::class);
     }
 }

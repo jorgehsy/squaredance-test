@@ -16,13 +16,13 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return response()->json(Product::active()->get());
+        return response()->json(Product::available()->get());
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  ProductRequest  $productRequest
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(ProductRequest $productRequest)

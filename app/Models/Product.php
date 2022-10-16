@@ -38,6 +38,13 @@ class Product extends Model
         return $this->hasMany(Transaction::class);
     }
 
+    public function scopeAvailable($query){
+        return $query->where([
+            ['status', Product::$ACTIVE],
+            ['monthly_inventory', '>', 0]
+        ]);
+    }
+
     public function scopeActive($query){
         return $query->where('status', Product::$ACTIVE);
     }
@@ -58,8 +65,26 @@ class Product extends Model
         return $this;
     }
 
+    private function reduceInventory(int $quantity = 1){
+        $result = $this->monthly_inventory - $quantity;
+
+        if ( $result < 0 )
+            throw new Exception("There is no inventory to make this sale", 400);
+
+        $this->update([
+            'monthly_inventory' => $this->monthly_inventory - $quantity,
+            'status' => $result === 0 ? Product::$EXPIRED : $this->status
+        ]);
+
+        return $this;
+    }
+
+    public function hasAvailableInventory(){
+        return $this->monthly_inventory > 0;
+    }
+
     public function isAvailable(){
-        return $this->status === Product::$ACTIVE;
+        return $this->status === Product::$ACTIVE && $this->hasAvailableInventory();
     }
 
     public function activate(){
@@ -90,6 +115,18 @@ class Product extends Model
         ->update(
             ['status' => UserProduct::$REJECTED]
         );
+
+        return $this;
+    }
+
+    public function sell(int $quantity = 1){
+        if ( !$this->isAvailable() )
+            throw new \Exception("Product expired", 400);
+
+        if ( !$this->hasAvailableInventory() )
+            throw new \Exception("Not inventory left", 400);
+
+        $this->reduceInventory($quantity);
 
         return $this;
     }
