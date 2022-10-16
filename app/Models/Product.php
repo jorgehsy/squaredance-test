@@ -27,16 +27,70 @@ class Product extends Model
     /**
      * The user owner of the product which will get the paying amount when it gets sold
      */
-    public function owners(){
-        return $this->hasManyThrough(User::class, UserProduct::class, 'product_id', 'id', 'id', 'user_id');
-        //return $this->belongsToMany(User::class, UserProduct::class, 'product_id', 'user_id', 'id', 'id');
+    public function owner(){
+        return $this->hasOneThrough(User::class, UserProduct::class, 'product_id', 'id', 'id', 'user_id');
     }
 
     /**
-     *
+     * Return de transactions made for this product
      */
     public function transactions(){
         return $this->hasMany(Transaction::class);
     }
 
+    public function scopeActive($query){
+        return $query->where('status', Product::$ACTIVE);
+    }
+
+    public function scopeExpired($query){
+        return $query->where('status', Product::$EXPIRED);
+    }
+
+    public function scopeOnHold($query){
+        return $query->where('status', Product::$ONHOLD);
+    }
+
+    private function changeStatus(string $status){
+        $this->update([
+            'status' => $status
+        ]);
+
+        return $this;
+    }
+
+    public function isAvailable(){
+        return $this->status === Product::$ACTIVE;
+    }
+
+    public function activate(){
+        $this->changeStatus(Product::$ACTIVE);
+
+        return $this;
+    }
+
+    public function expire(){
+        $this->changeStatus(Product::$EXPIRED);
+
+        return $this;
+    }
+
+    public function approve(){
+        $this->changeStatus(Product::$ACTIVE)
+        ->owner()
+        ->update(
+            ['status' => UserProduct::$APPROVED]
+        );
+
+        return $this;
+    }
+
+    public function reject(){
+        $this->changeStatus(Product::$ONHOLD)
+        ->owner()
+        ->update(
+            ['status' => UserProduct::$REJECTED]
+        );
+
+        return $this;
+    }
 }

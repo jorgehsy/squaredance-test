@@ -10,10 +10,16 @@ class UserProduct extends Pivot
     public static $PENDING = 'pending';
     public static $REJECTED = 'rejected';
 
+    /**
+    * Return the product owner
+    */
     public function owner() {
         return $this->belongsTo(User::class);
     }
 
+    /**
+    * Return the product
+    */
     public function product() {
         return $this->belongsTo(Product::class);
     }
