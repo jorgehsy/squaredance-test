@@ -26,5 +26,6 @@ Route::middleware('auth:sanctum')->group( function () {
 
     Route::post('product/{product}/sell', [StoreController::class, 'makeSell']);
 
+    // TODO: protect endpoints, only managers can update products
     Route::post('product/{product}/manage/{status}', [ManagerController::class, 'manageProduct']);
 });

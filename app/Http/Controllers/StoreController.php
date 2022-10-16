@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class StoreController extends Controller
 {
     /**
-     * Make the sale of the product deducting their inventory
+     * Make the sale of the product by creating a transaction and deducting their inventory
      * @param  \Illuminate\Http\Request  $request
      * @param Product
      */

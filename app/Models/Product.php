@@ -83,8 +83,12 @@ class Product extends Model
         return $this->monthly_inventory > 0;
     }
 
-    public function isAvailable(){
-        return $this->status === Product::$ACTIVE && $this->hasAvailableInventory();
+    public function isActive(){
+        return $this->status === Product::$ACTIVE;
+    }
+
+    public function canBeSell(){
+        return $this->isActive() && $this->hasAvailableInventory();
     }
 
     public function activate(){
@@ -120,11 +124,8 @@ class Product extends Model
     }
 
     public function sell(int $quantity = 1){
-        if ( !$this->isAvailable() )
+        if ( !$this->canBeSell() )
             throw new \Exception("Product expired", 400);
-
-        if ( !$this->hasAvailableInventory() )
-            throw new \Exception("Not inventory left", 400);
 
         $this->reduceInventory($quantity);
 

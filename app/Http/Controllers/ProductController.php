@@ -43,7 +43,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        if ( !$product->isAvailable() )
+        if ( !$product->canBeSell() )
             return abort(404);
 
         return response()->json($product);
