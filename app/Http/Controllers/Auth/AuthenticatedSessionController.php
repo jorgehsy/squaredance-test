@@ -43,13 +43,6 @@ class AuthenticatedSessionController extends Controller
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 
-    public function randomLogin(Request $request){
-        $user = User::randomUser();
-        Auth::login($user);
-
-        return redirect()->intended(RouteServiceProvider::HOME);
-    }
-
     /**
      * Destroy an authenticated session.
      *
