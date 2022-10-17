@@ -1,66 +1,125 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Squaredance Challenge Solution
 
-## About Laravel
+The following is my solution to the backend challenge requested by Squaredance. For experience that reviewing code can be a little tedious and for the sake of simplicity, I avoided using some PHP tricks to write less code. This was with the purpose of maximizing the code readability and understanding my proposed solution, while respecting good design patterns and the single responsibility principle.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Laravel framework and its ecosystem were used to build the solution.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+# Tasks
 
-## Learning Laravel
+The main task was to create a few endpoints fed by a proposed schema. Around those involved some other requirements and were added to build a more complete solution. Those are the following:
+- Authentication using Laravel Sanctum
+- Endpoints to make sales and deduct product inventory
+- Endpoints to approve or reject pending products
+- A very simple (and ugly) frontpage just to play around with the solution
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+# Demo environment
+> **Don't want to read? below you will find a TL;DR with all the instructions**
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+This solution can be launched using Docker. This is the easiest way to get the application up and running. 
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+For this to work you only need two requirements:
+- Docker Desktop installed [Docker Installation](https://www.docker.com/products/docker-desktop/)
 
-## Laravel Sponsors
+Next, follow the next instructions (assuming linux/macos system):
+```
+git clone https://github.com/jorgehsy/squaredance-test.git
+cd squaredance-test
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v $(pwd):/var/www/html \
+    -w /var/www/html \
+    laravelsail/php81-composer:latest \
+    composer install --ignore-platform-reqs
+```
+This could take minutes to finish, once done, run the next command to start the docker container as a daemon
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+```        
+./vendor/bin/sail up -d
+```
 
-### Premium Partners
+Then we need to setup the enviroment file and some migrations. Run the following commands:
+```
+cp .env.example .env
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan migrate
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+That's it! the API is ready to use. If you like to use some API test software like Postman, you can use the file `squaredance-test.har` located in this repo and import it.
 
-## Contributing
+Available methods: 
+```
+  POST            api/auth/login 
+  POST            api/auth/register 
+  POST            api/product/{product}/manage/{status} 
+  POST            api/product/{product}/sell 
+  GET|HEAD        api/products 
+  POST            api/products 
+  GET|HEAD        api/products/create
+  GET|HEAD        api/products/status/pending
+  GET|HEAD        api/products/{product}
+  PUT|PATCH       api/products/{product} 
+  DELETE          api/products/{product}
+  GET|HEAD        api/products/{product}/edit
+  GET|HEAD        api/users/{user}/notifications 
+  PUT             api/users/{user}/notifications/{id
+````
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+If you like to try the ugly front, follow the next commands:
+```
+./vendor/bin/sail npm install
+./vendor/bin/sail npm run build
+```
+This will build the files needed to get the login and dashboard ready. 
 
-## Code of Conduct
+Visit the site on the browser (should be http://localhost). 
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+You can now login (use the random log in button) and enter the dashboard. This button will create an user with some data ready to try.
 
-## Security Vulnerabilities
+---
+## TL;DR
+```
+git clone https://github.com/jorgehsy/squaredance-test.git
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+cd squaredance-test
 
-## License
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v $(pwd):/var/www/html \
+    -w /var/www/html \
+    laravelsail/php81-composer:latest \
+    composer install --ignore-platform-reqs
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+./vendor/bin/sail up -d
+
+cp .env.example .env
+
+./vendor/bin/sail artisan key:generate
+
+./vendor/bin/sail artisan migrate
+
+./vendor/bin/sail npm install
+
+./vendor/bin/sail npm run build
+```
+
+---
+### ¿Don't want to use docker?
+
+You should satisfy the requirements to install Laravel 9 and the standart instrucctions to run on a local enviroment [Installation instructions](https://laravel.com/docs/9.x#initial-configuration)
+
+
+# Solution Explanation
+
+The first thing that comes to my mind is an event-driven application, where you subscribe to channels to consume the notifications as soon as the status changes. Tools like Kafka or RabbitMQ are popular to solve this in a more reliable way, but for this challenge, they will surely be overkill.
+
+
+We need to create some models to construct the business logic:
+- **User**: resource to identify the owner of the products and the buyer of the products.
+- **Product**:foundational resource where the functional logic is built around it.
+- **Transaction**: basic model to record the sales and calculate the user profit
+- **UserProduct**: pivot model to improve the usability of the relationship between user and product
+
+
+Using the Laravel Observers we catch when a product status changes on update and save the specific notification using the Laravel Notification solution. I repeat, this type of notification should not be saved on a database like MySQL or PostgreSQL for multiple reasons.
