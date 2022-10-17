@@ -4,20 +4,28 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\Product;
+use App\Models\User;
+use App\Models\UserProduct;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 class AuthenticatedSessionController extends Controller
 {
     /**
      * Display the login view.
      *
-     * @return \Illuminate\View\View
+     * @return \Inertia\Response
      */
     public function create()
     {
-        return view('auth.login');
+        return Inertia::render('Auth/Login', [
+            'canResetPassword' => Route::has('password.request'),
+            'status' => session('status'),
+        ]);
     }
 
     /**
@@ -31,6 +39,13 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+
+        return redirect()->intended(RouteServiceProvider::HOME);
+    }
+
+    public function randomLogin(Request $request){
+        $user = User::randomUser();
+        Auth::login($user);
 
         return redirect()->intended(RouteServiceProvider::HOME);
     }

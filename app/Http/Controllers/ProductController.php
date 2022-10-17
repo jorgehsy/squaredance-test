@@ -16,7 +16,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return response()->json(Product::available()->get());
+        return response()->json(Product::available()->with('owner')->get());
     }
 
     /**
@@ -47,5 +47,12 @@ class ProductController extends Controller
             return abort(404);
 
         return response()->json($product);
+    }
+
+    /**
+     * Methods to make the demo front
+     */
+    public function pendingList(){
+        return response()->json(Product::pending()->get());
     }
 }

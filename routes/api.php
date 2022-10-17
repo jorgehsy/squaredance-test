@@ -17,10 +17,6 @@ use \App\Http\Controllers\UserController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-Route::post('/auth/login', [AuthController::class, 'login']);
-Route::post('/auth/register', [AuthController::class, 'register']);
-
 Route::middleware('auth:sanctum')->group( function () {
     Route::resource('products', ProductController::class);
     Route::get('/users/{user}/notifications', [UserController::class, 'getNotifications']);
@@ -31,4 +27,7 @@ Route::middleware('auth:sanctum')->group( function () {
     // TODO: protect endpoints with roles, only managers can update products
     // -> https://laravel.com/docs/9.x/authorization
     Route::post('product/{product}/manage/{status}', [ManagerController::class, 'manageProduct']);
+
+    // Routes only to make the demo front
+    Route::get('products/status/pending', [ProductController::class, 'pendingList']);
 });

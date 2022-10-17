@@ -59,6 +59,13 @@ class Product extends Model
         return $query->where('status', Product::$ONHOLD);
     }
 
+    public function scopePending($query){
+        return $query->with('owner')
+            ->whereHas('owner', function($q){
+                $q->where('status', UserProduct::$PENDING);
+            });
+    }
+
     private function changeStatus(string $status){
         $this->update([
             'status' => $status

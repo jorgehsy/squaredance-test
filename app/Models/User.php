@@ -41,6 +41,14 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'profit'
+    ];
+
+    public function getProfitAttribute(){
+        return count($this->transactions);
+    }
+
     /**
      * The products list that the user own
      */
@@ -51,5 +59,26 @@ class User extends Authenticatable
 
     public function transactions(){
         return $this->hasMany(Transaction::class);
+    }
+
+    public static function randomUser(){
+        return User::factory()
+            ->hasAttached(
+                Product::factory()->count(2)->active(),
+                ['status' => UserProduct::$APPROVED]
+            )
+            ->hasAttached(
+                Product::factory()->count(1)->onHold(),
+                ['status' => UserProduct::$PENDING]
+            )
+            ->hasAttached(
+                Product::factory()->count(1)->onHold(),
+                ['status' => UserProduct::$REJECTED]
+            )
+            ->hasAttached(
+                Product::factory()->count(1)->expired(),
+                ['status' => UserProduct::$APPROVED]
+            )
+            ->create();
     }
 }
